@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  password   String
+  savedTrips Trip[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Trip {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  origin             String   @default("Unknown")
+  destination        String
+  budget             Float
+  currency           String   @default("USD")
+  startDate          DateTime
+  endDate            DateTime
+  status             String   @default("DRAFT") // "DRAFT" or "FINALIZED"
+  itinerary          String   // We store the IDay[] array as a serialized JSON string in SQLite
+  totalEstimatedCost Float    @default(0)
+  preferences        String   @default("")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
